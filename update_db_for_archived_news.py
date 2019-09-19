@@ -3,13 +3,26 @@
 from scraper.settings import new_connection
 from importlib import import_module
 from scraper.sources import KNOWN_NEWS_SOURCES
+import datetime as dt
+import dateutil.parser as parser
+
+
+def extract_headlines(headlines):
+    h=[]
+    for x in headlines:
+        if parser.parse(x['published_at']).replace(tzinfo=None).day == (dt.datetime.today() - dt.timedelta(1)).day:
+            h.append(x)
+    return h
+
 
 
 def update_database(collection, headlines):
-    if headlines is None:
+    if headlines is None or len(headlines) == 0:
         return
-    from pymongo import ReplaceOne
+    from pymongo import UpdateOne,InsertOne
     operations = []
+    conn = new_connection(collection)
+
     for headline in headlines:
         db_object = {
             "link": headline["link"],
@@ -17,20 +30,26 @@ def update_database(collection, headlines):
             "content": headline["content"],
             "title": headline["title"]
         }
-        operations.append(ReplaceOne(
-            filter={ "link": headline["link"] },
-            replacement=db_object,
-            upsert=True
-        ))
-    new_connection(collection).bulk_write(operations)
+        if conn.count_documents({"link": headline["link"]}) == 0:
+            db_object["lifetime"] = 0
+            operations.append(InsertOne(db_object))
+            
+        else:
+            operations.append(UpdateOne(
+                {"link": headline["link"]},
+                {
+                    "$set": {"content": headline["content"]}
+                }
+            ))
+    conn.bulk_write(operations)
 
 
 def to_go_on_next_page_or_not(collection, headlines):
-    conn = new_connection(collection)
+
     for x in headlines[:-1]:
-        if conn.count_documents({"link": x["link"]}) == 0:
-            return True
-    return False
+        if parser.parse(x['published_at']).replace(tzinfo=None) < dt.datetime.today() - dt.timedelta(1):
+            return False
+    return True
 
 
 if __name__ == "__main__":
@@ -38,10 +57,13 @@ if __name__ == "__main__":
         src = KNOWN_NEWS_SOURCES[key]
         src["module"] = "scraper." + key.lower().replace(" ", "-")
         src["module"] = import_module(src["module"])
-    for key in KNOWN_NEWS_SOURCES:
+    # for key in KNOWN_NEWS_SOURCES:
+    for key in ["The Hindu"]:
+        print(key)
         src = KNOWN_NEWS_SOURCES[key]
         mod = src["module"]
-        for i in range(1, 5):
+        i=1
+        while True:
             print(end=".")
             import sys
             sys.stdout.flush()
@@ -51,10 +73,14 @@ if __name__ == "__main__":
                 else:
                     headlines = mod.get_chronological_headlines(src["pages"].format(i))
                 if to_go_on_next_page_or_not(key, headlines):
+                    i+=1    
                     update_database(key, headlines)
                 else:
+                    update_database(key,extract_headlines(headlines))
                     break
                 print(" " + key + ": Scraping finished till", i - 1)
+                
             except Exception as e:
-                print("ERROR in", key)
+                print("ERROR in", key,e)
                 break
+            
