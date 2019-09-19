@@ -31,6 +31,7 @@ def get_all_content(objects):
         sleep(1)
         response = requests.get(url)
         if response.status_code == 200:
+            
             html_content = BeautifulSoup(response.text, "html.parser")
             try:
                 text = html_content.find("div", id=re.compile("content-body-*")).get_text()
@@ -99,8 +100,13 @@ def get_trending_headlines(url):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
+        
         soup.find("div", { "class": "100_3x_JustIn" }).decompose()
-        a_tags = soup.find("div", { "class": "main" }).find_all(find_a_tag_in_trending)
+        
+        a_tags = soup.find("div", { "class": "container-main" }).find_all(find_a_tag_in_trending)
+        
+        
+        
         headlines = list(map(get_headline_details, a_tags))
         return headlines
     return None
