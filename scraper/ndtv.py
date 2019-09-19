@@ -8,6 +8,8 @@ It provides:
 
 import os
 from sys import path
+import pytz
+tz = pytz.timezone('Asia/Kolkata')
 
 import requests
 from bs4 import BeautifulSoup
@@ -57,8 +59,8 @@ def get_headline_details(obj):
         return {
             "content": "NA",
             "link": obj["href"].split("?")[0],
-            "scraped_at": datetime.utcnow().isoformat(),
-            "published_at": ist_to_utc(timestamp).isoformat(),
+            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
+            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
             "title": "\n".join(filter(
                 str_is_set,
                 map(

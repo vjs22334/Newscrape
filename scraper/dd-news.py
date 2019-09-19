@@ -10,6 +10,8 @@ import requests
 from bs4 import BeautifulSoup
 from sys import path
 import os
+import pytz
+tz = pytz.timezone('Asia/Kolkata')
 path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from sources import KNOWN_NEWS_SOURCES
 from newscrape_common import   \
@@ -54,8 +56,8 @@ def get_chronological_headline_details(obj):
         return {
             "content": "NA",
             "link": "http://ddnews.gov.in" + obj["href"],
-            "scraped_at": datetime.utcnow().isoformat(),
-            "published_at": ist_to_utc(timestamp).isoformat(),
+            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
+            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
             "title": obj.find("p", {"class": "archive-title"}).get_text().strip()
         }
     except KeyError:

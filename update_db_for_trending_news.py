@@ -16,7 +16,7 @@ def update_database(collection, headlines):
     conn = new_connection(collection)
     for headline in headlines:
 
-        diff = (parser.parse(headline["scraped_at"]) - parser.parse(headline["published_at"]).replace(tzinfo=None))
+        diff = (parser.parse(headline["scraped_at"]) - parser.parse(headline["published_at"]))
         db_object = {
             "link": headline["link"],
             "pub_date": headline["published_at"],
@@ -27,7 +27,7 @@ def update_database(collection, headlines):
             operations.append(InsertOne(db_object))
         else:
 
-            diff = (parser.parse(headline["scraped_at"]) - parser.parse(headline["published_at"]).replace(tzinfo=None))
+            diff = (parser.parse(headline["scraped_at"]) - parser.parse(headline["published_at"]))
             operations.append(UpdateOne(
                 {"link": headline["link"]},
                 {

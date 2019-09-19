@@ -5,12 +5,17 @@ from importlib import import_module
 from scraper.sources import KNOWN_NEWS_SOURCES
 import datetime as dt
 import dateutil.parser as parser
+from dateutil.tz import *
+import pytz
+
+tz = pytz.timezone('Asia/Kolkata')
+local = tzlocal()
 
 
 def extract_headlines(headlines):
     h=[]
     for x in headlines:
-        if parser.parse(x['published_at']).replace(tzinfo=None).day == (dt.datetime.today() - dt.timedelta(1)).day:
+        if parser.parse(x['published_at']) == (dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1)).day:
             h.append(x)
     return h
 
@@ -47,7 +52,7 @@ def update_database(collection, headlines):
 def to_go_on_next_page_or_not(collection, headlines):
 
     for x in headlines[:-1]:
-        if parser.parse(x['published_at']).replace(tzinfo=None) < dt.datetime.today() - dt.timedelta(1):
+        if parser.parse(x['published_at']) < dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1):
             return False
     return True
 

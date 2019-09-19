@@ -9,6 +9,8 @@ It provides:
 import os
 from datetime import datetime
 from sys import path
+import pytz
+tz = pytz.timezone('Asia/Kolkata')
 
 import requests
 from bs4 import BeautifulSoup, NavigableString

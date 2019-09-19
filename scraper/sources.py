@@ -39,12 +39,12 @@ KNOWN_NEWS_SOURCES = {
         "page1": "http://ddnews.gov.in/about/news-archive?news_type=6",
         "pages": "http://ddnews.gov.in/about/news-archive?news_type=6&page={}"
     },
-    "NEWS18": {
-        "home": "https://www.news18.com/",
-        "india": "https://www.news18.com/india/",
-        "page1": "",
-        "pages": "https://www.news18.com/india/page-{}/"
-    },
+    # "NEWS18": {
+    #     "home": "https://www.news18.com/",
+    #     "india": "https://www.news18.com/india/",
+    #     "page1": "",
+    #     "pages": "https://www.news18.com/india/page-{}/"
+    # },
     "Telegraph": {
         "home": "https://www.telegraphindia.com/",
         "india": "https://www.telegraphindia.com/india",

@@ -5,7 +5,8 @@ It provides:
 - get_chronological_headlines(url)
 - get_trending_headlines(url)
 """
-
+from dateutil.tz import *
+import pytz
 import os
 import re
 from datetime import datetime
@@ -52,11 +53,12 @@ def get_headline_details(obj):
             obj["title"].split("Published: ")[1].split(" IST")[0],
             "%B %d, %Y %H:%M"
         )
+        tz = pytz.timezone('Asia/Kolkata')
         return {
             "content": "NA",
             "link": obj["href"],
-            "scraped_at": datetime.utcnow().isoformat(),
-            "published_at": ist_to_utc(timestamp).isoformat(),
+            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
+            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
             "title": "\n".join(filter(
                 str_is_set,
                 map(
@@ -117,11 +119,11 @@ if __name__ == "__main__":
 
     SRC = KNOWN_NEWS_SOURCES["The Hindu"]
 
-    print(json.dumps(
-        get_chronological_headlines(SRC["pages"].format(1)),
-        sort_keys=True,
-        indent=4
-    ))
+    # print(json.dumps(
+    #     get_chronological_headlines(SRC["pages"].format(1)),
+    #     sort_keys=True,
+    #     indent=4
+    # ))
 
     print(json.dumps(
         get_trending_headlines(SRC["home"]),
