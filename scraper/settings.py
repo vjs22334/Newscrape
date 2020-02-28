@@ -11,14 +11,14 @@ def new_connection(collection):
     """
     load_dotenv()
     host = getenv("HOST")
-    username = getenv("USERNAME")
+    username = getenv("UNAME")
     password = getenv("PASSWORD")
     database = getenv("DATABASE")
     # client = MongoClient(host, serverSelectionTimeoutMS=6000)
     # data_base = client[database]
     # if data_base.authenticate(username, password, mechanism='SCRAM-SHA-1'):
     #     return data_base[collection]
-    client = MongoClient('mongodb://'+username+':'+password+'@localhost:27017/')
+    client = MongoClient('mongodb://'+username+':'+password+'@localhost:27017/'+database)
 
 
     db = client[database][collection]

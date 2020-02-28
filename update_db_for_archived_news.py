@@ -12,21 +12,25 @@ tz = pytz.timezone('Asia/Kolkata')
 local = tzlocal()
 
 
-def extract_headlines(headlines):
-    h=[]
-    for x in headlines:
-        if parser.parse(x['published_at']) == (dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1)).day:
-            h.append(x)
-    return h
+# def extract_headlines(headlines):
+#     h=[]
+#     import pdb; pdb.set_trace()
+#     for x in headlines:
+#         if parser.parse(x['published_at']) == (dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1)).day:
+#             h.append(x)
+#     return h
 
 
 
 def update_database(collection, headlines):
+
     if headlines is None or len(headlines) == 0:
         return
     from pymongo import UpdateOne,InsertOne
     operations = []
     conn = new_connection(collection)
+
+    
 
     for headline in headlines:
         db_object = {
@@ -63,6 +67,7 @@ if __name__ == "__main__":
         src["module"] = "scraper." + key.lower().replace(" ", "-")
         src["module"] = import_module(src["module"])
     # for key in KNOWN_NEWS_SOURCES:
+    # import pdb; pdb.set_trace()
     for key in ["The Hindu"]:
         print(key)
         src = KNOWN_NEWS_SOURCES[key]
@@ -81,7 +86,8 @@ if __name__ == "__main__":
                     i+=1    
                     update_database(key, headlines)
                 else:
-                    update_database(key,extract_headlines(headlines))
+                    # update_database(key,extract_headlines(headlines))
+                    update_database(key, headlines)
                     break
                 print(" " + key + ": Scraping finished till", i - 1)
                 
