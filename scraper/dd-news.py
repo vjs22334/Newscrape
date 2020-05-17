@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from sys import path
 import os
 import pytz
+from datetime import datetime,timezone
+from dateutil.tz import *
 tz = pytz.timezone('Asia/Kolkata')
 path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from sources import KNOWN_NEWS_SOURCES
@@ -56,8 +58,8 @@ def get_chronological_headline_details(obj):
         return {
             "content": "NA",
             "link": "http://ddnews.gov.in" + obj["href"],
-            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
-            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
+            "scraped_at": datetime.now(timezone.utc).astimezone(tz).isoformat(),
+            "published_at": tz.localize(timestamp).astimezone(tz).isoformat(),
             "title": obj.find("p", {"class": "archive-title"}).get_text().strip()
         }
     except KeyError:

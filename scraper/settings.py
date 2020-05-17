@@ -14,10 +14,6 @@ def new_connection(collection):
     username = getenv("USERNAME")
     password = getenv("PASSWORD")
     database = getenv("DATABASE")
-    # client = MongoClient(host, serverSelectionTimeoutMS=6000)
-    # data_base = client[database]
-    # if data_base.authenticate(username, password, mechanism='SCRAM-SHA-1'):
-    #     return data_base[collection]
     client = MongoClient('mongodb://'+username+':'+password+'@localhost:27017/')
 
 

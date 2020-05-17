@@ -10,6 +10,8 @@ import os
 from sys import path
 import pytz
 tz = pytz.timezone('Asia/Kolkata')
+from datetime import datetime,timezone
+from dateutil.tz import *
 
 import requests
 from bs4 import BeautifulSoup
@@ -61,8 +63,8 @@ def get_headline_details(obj):
         return {
             "content": "NA",
             "link": "https://www.deccanchronicle.com" + obj["href"],
-            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
-            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
+            "scraped_at": datetime.now(timezone.utc).astimezone(tz).isoformat(),
+            "published_at": tz.localize(timestamp).astimezone(tz).isoformat(),
             "title": obj.find(['h3', 'h2']).contents[0].strip()
         }
     except KeyError:

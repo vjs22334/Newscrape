@@ -10,6 +10,8 @@ import os
 from sys import path
 import pytz
 tz = pytz.timezone('Asia/Kolkata')
+from datetime import datetime,timezone
+from dateutil.tz import *
 
 import requests
 from bs4 import BeautifulSoup
@@ -35,6 +37,7 @@ def get_all_content(objects):
 
 def get_headline_details(obj):
     try:
+        tz = pytz.timezone('Asia/Kolkata')
         from datetime import datetime
         timestamp_tag = obj.parent.parent.find(
             "div", {"class": "nstory_dateline"}
@@ -59,8 +62,8 @@ def get_headline_details(obj):
         return {
             "content": "NA",
             "link": obj["href"].split("?")[0],
-            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
-            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
+            "scraped_at": datetime.now(timezone.utc).astimezone(tz).isoformat(),
+            "published_at": tz.localize(timestamp).astimezone(tz).isoformat(),
             "title": "\n".join(filter(
                 str_is_set,
                 map(

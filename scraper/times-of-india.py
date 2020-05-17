@@ -16,6 +16,8 @@ from bs4 import BeautifulSoup
 path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from sources import KNOWN_NEWS_SOURCES
 from newscrape_common import ist_to_utc
+from datetime import timezone
+from dateutil.tz import *
 
 
 def get_chronological_headlines(url):
@@ -35,7 +37,7 @@ def get_chronological_headlines(url):
             data.append({
                 "link": "https://timesofindia.indiatimes.com"+obj.find("a").get("href"),
                 "content": "NA",
-                "scraped_at": datetime.utcnow().isoformat(),
+                "scraped_at": datetime.now(timezone.utc).astimezone(tz).isoformat(),
                 "published_at": clean_dt,
                 "title": obj.find("a").get("title")
             })

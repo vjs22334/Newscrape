@@ -62,8 +62,8 @@ if __name__ == "__main__":
         src = KNOWN_NEWS_SOURCES[key]
         src["module"] = "scraper." + key.lower().replace(" ", "-")
         src["module"] = import_module(src["module"])
-    # for key in KNOWN_NEWS_SOURCES:
-    for key in ["The Hindu"]:
+    for key in KNOWN_NEWS_SOURCES:
+    # for key in ["The Hindu"]:
         print(key)
         src = KNOWN_NEWS_SOURCES[key]
         mod = src["module"]

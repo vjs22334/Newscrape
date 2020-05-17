@@ -11,6 +11,8 @@ from datetime import datetime
 from sys import path
 import pytz
 tz = pytz.timezone('Asia/Kolkata')
+from datetime import timezone,datetime
+from dateutil.tz import *
 
 import requests
 from bs4 import BeautifulSoup, NavigableString
@@ -38,7 +40,7 @@ def get_all_content(objects):
             str_time = pub_tag.find("script").text.split("'")[1].split(
                 "<strong>First Published:</strong> "
             )[1]
-            obj["published_at"] = ist_to_utc(datetime.strptime(
+            obj["published_at"] = ist_to_utc(datetime.datetime.strptime(
                 str_time,
                 "%B %d, %Y, %I:%M %p %Z"
             )).isoformat()
@@ -63,7 +65,7 @@ def get_headline_details(obj):
         return {
             "content": "NA",
             "link": obj["href"].split("?")[0],
-            "scraped_at": datetime.utcnow().isoformat(),
+            "scraped_at": datetime.datetime.now(timezone.utc).astimezone(tz).isoformat(),
             "published_at": None,
             "title": title
         }

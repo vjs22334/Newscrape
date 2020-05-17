@@ -9,7 +9,7 @@ from dateutil.tz import *
 import pytz
 import os
 import re
-from datetime import datetime
+from datetime import datetime,timezone
 from sys import path
 
 import requests
@@ -29,18 +29,22 @@ def get_all_content(objects):
     """
     def get_content(url):
         from time import sleep
-        sleep(1)
-        response = requests.get(url)
-        if response.status_code == 200:
-            
-            html_content = BeautifulSoup(response.text, "html.parser")
-            try:
-                text = html_content.find("div", id=re.compile("content-body-*")).get_text()
-            except AttributeError:
-                text = html_content.find("div", {
-                    "class": "lead-video-cont"
-                }).find("iframe").get("src")
-            return text
+        #sleep(1)
+        #import pdb; pdb.set_trace()
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                
+                html_content = BeautifulSoup(response.text, "html.parser")
+                try:
+                    text = html_content.find("div", id=re.compile("content-body-*")).get_text()
+                except AttributeError:
+                    text = html_content.find("div", {
+                        "class": "lead-video-cont"
+                    }).find("iframe").get("src")
+                return text
+        except:
+            pass
         return "NA"
 
     for obj in objects:
@@ -54,11 +58,12 @@ def get_headline_details(obj):
             "%B %d, %Y %H:%M"
         )
         tz = pytz.timezone('Asia/Kolkata')
+        #import pdb; pdb.set_trace()
         return {
             "content": "NA",
             "link": obj["href"],
-            "scraped_at": datetime.utcnow().astimezone(tz).isoformat(),
-            "published_at": ist_to_utc(timestamp).astimezone(tz).isoformat(),
+            "scraped_at": datetime.now(timezone.utc).astimezone(tz).isoformat(),
+            "published_at": tz.localize(timestamp).astimezone(tz).isoformat(),
             "title": "\n".join(filter(
                 str_is_set,
                 map(
@@ -119,14 +124,14 @@ if __name__ == "__main__":
 
     SRC = KNOWN_NEWS_SOURCES["The Hindu"]
 
-    # print(json.dumps(
-    #     get_chronological_headlines(SRC["pages"].format(1)),
-    #     sort_keys=True,
-    #     indent=4
-    # ))
-
     print(json.dumps(
-        get_trending_headlines(SRC["home"]),
+        get_chronological_headlines(SRC["pages"].format(1)),
         sort_keys=True,
         indent=4
     ))
+
+    # print(json.dumps(
+    #     get_trending_headlines(SRC["home"]),
+    #     sort_keys=True,
+    #     indent=4
+    # ))

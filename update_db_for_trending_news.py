@@ -38,8 +38,8 @@ def update_database(collection, headlines):
    
 
 if __name__ == "__main__":
-    # for key in KNOWN_NEWS_SOURCES:
-    for key in ["The Hindu"]:
+    for key in KNOWN_NEWS_SOURCES:
+    # for key in ["The Hindu"]:
         src = KNOWN_NEWS_SOURCES[key]
         src["module"] = "scraper." + key.lower().replace(" ", "-")
         mod = import_module(src["module"])
