@@ -7,6 +7,7 @@ import datetime as dt
 import dateutil.parser as parser
 from dateutil.tz import *
 import pytz
+from wordClassifier import *
 
 tz = pytz.timezone('Asia/Kolkata')
 local = tzlocal()
@@ -30,14 +31,21 @@ def update_database(collection, headlines):
     operations = []
     conn = new_connection(collection)
 
-    
+   
 
     for headline in headlines:
+        categories = {"urban":0,"rural":0}
+        scores = classify(headline["content"])
+        if scores["rural"]>scores["urban"]:
+            categories["rural"] = 1
+        else:
+            categories["urban"] = 1
         db_object = {
-            "link": headline["link"],
-            "published_time": headline["published_at"],
+            "link" : headline["link"],
+            "published_time" : headline["published_at"],
             "content": headline["content"],
-            "title": headline["title"]
+            "title" : headline["title"],
+            "categories" : categories
         }
         if conn.count_documents({"link": headline["link"]}) == 0:
             db_object["lifetime"] = 0
@@ -47,7 +55,9 @@ def update_database(collection, headlines):
             operations.append(UpdateOne(
                 {"link": headline["link"]},
                 {
-                    "$set": {"content": headline["content"]}
+                    "$set": {"content" : headline["content"],
+                            "categories" : categories
+                    }
                 }
             ))
     conn.bulk_write(operations)

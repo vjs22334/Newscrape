@@ -5,3 +5,4 @@ __pycache__
 *.log
 *.vscode
 
+glove.6B.100d.txt
