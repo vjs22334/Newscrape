@@ -11,7 +11,7 @@ def new_connection(collection):
     """
     load_dotenv()
     host = getenv("HOST")
-    username = getenv("USERNAME")
+    username = getenv("UNAME")
     password = getenv("PASSWORD")
     database = getenv("DATABASE")
     client = MongoClient('mongodb://'+username+':'+password+'@localhost:27017/')

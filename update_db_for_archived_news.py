@@ -7,33 +7,45 @@ import datetime as dt
 import dateutil.parser as parser
 from dateutil.tz import *
 import pytz
+from wordClassifier import *
 
 tz = pytz.timezone('Asia/Kolkata')
 local = tzlocal()
 
 
-def extract_headlines(headlines):
-    h=[]
-    for x in headlines:
-        if parser.parse(x['published_at']) == (dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1)).day:
-            h.append(x)
-    return h
+# def extract_headlines(headlines):
+#     h=[]
+#     import pdb; pdb.set_trace()
+#     for x in headlines:
+#         if parser.parse(x['published_at']) == (dt.datetime.today().replace(tzinfo=local).astimezone(tz) - dt.timedelta(1)).day:
+#             h.append(x)
+#     return h
 
 
 
 def update_database(collection, headlines):
+
     if headlines is None or len(headlines) == 0:
         return
     from pymongo import UpdateOne,InsertOne
     operations = []
     conn = new_connection(collection)
 
+   
+
     for headline in headlines:
+        categories = {"urban":0,"rural":0}
+        scores = classify(headline["content"])
+        if scores["rural"]>scores["urban"]:
+            categories["rural"] = 1
+        else:
+            categories["urban"] = 1
         db_object = {
-            "link": headline["link"],
-            "published_time": headline["published_at"],
+            "link" : headline["link"],
+            "published_time" : headline["published_at"],
             "content": headline["content"],
-            "title": headline["title"]
+            "title" : headline["title"],
+            "categories" : categories
         }
         if conn.count_documents({"link": headline["link"]}) == 0:
             db_object["lifetime"] = 0
@@ -43,7 +55,9 @@ def update_database(collection, headlines):
             operations.append(UpdateOne(
                 {"link": headline["link"]},
                 {
-                    "$set": {"content": headline["content"]}
+                    "$set": {"content" : headline["content"],
+                            "categories" : categories
+                    }
                 }
             ))
     conn.bulk_write(operations)
@@ -81,7 +95,8 @@ if __name__ == "__main__":
                     i+=1    
                     update_database(key, headlines)
                 else:
-                    update_database(key,extract_headlines(headlines))
+                    # update_database(key,extract_headlines(headlines))
+                    update_database(key, headlines)
                     break
                 print(" " + key + ": Scraping finished till", i - 1)
                 
